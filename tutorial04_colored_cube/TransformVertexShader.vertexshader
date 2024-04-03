@@ -18,4 +18,3 @@ void main(){
 	// to produce the color of each fragment
 	fragmentColor = vertexColor;
 }
-
