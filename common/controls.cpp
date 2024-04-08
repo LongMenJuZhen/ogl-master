@@ -37,7 +37,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 glm::vec3 X(1,0,0), Y(0,1,0), Z(0,0,1);
 
-#define  UIMODE_ORIGINAL
+// #define  UIMODE_ORIGINAL
 
 #ifdef UIMODE_ORIGINAL		// the original UI
 // Initial position : on +Z
@@ -225,7 +225,7 @@ void computeMatricesFromInputs(){
 	// Get mouse position
 	double xpos, ypos;
 
-	glfwGetCursorPos(window, &xpos, &ypos); //xpos ypos³õÊ¼ÖµÎª´°¿ÚÕýÖÐÐÄ£¬ ¼´1024/2, 768/2.
+	glfwGetCursorPos(window, &xpos, &ypos); //xpos yposï¿½ï¿½Ê¼ÖµÎªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ ï¿½ï¿½1024/2, 768/2.
 	
 	//std::cerr<<"\rxpos:"<<xpos<<" ypos:"<<ypos<<"\n"; 
 
