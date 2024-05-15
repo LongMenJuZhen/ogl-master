@@ -11,6 +11,7 @@
 GLFWwindow* window;
 
 // Include GLM
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
@@ -81,7 +82,7 @@ int main( void )
 	glBindVertexArray(VertexArrayID);
 
 	// Create and compile our GLSL program from the shaders
-	GLuint programID = LoadShaders( "StandardShading.vertexshader", "StandardTransparentShading.fragmentshader" );
+	GLuint programID = LoadShaders( "StandardShading.vertexshader.glsl", "StandardTransparentShading.fragmentshader.glsl" );
 
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");

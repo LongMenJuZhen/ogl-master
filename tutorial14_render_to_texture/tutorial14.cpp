@@ -71,8 +71,8 @@ int main( void )
     glfwPollEvents();
     glfwSetCursorPos(window, 1024/2, 768/2);
 
-	// Dark blue background
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	// Dark  background
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -87,7 +87,7 @@ int main( void )
 	glBindVertexArray(VertexArrayID);
 
 	// Create and compile our GLSL program from the shaders
-	GLuint programID = LoadShaders( "StandardShadingRTT.vertexshader", "StandardShadingRTT.fragmentshader" );
+	GLuint programID = LoadShaders( "StandardShadingRTT.vertexshader.glsl", "StandardShadingRTT.fragmentshader.glsl" );
 
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
@@ -214,7 +214,7 @@ int main( void )
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
 
 	// Create and compile our GLSL program from the shaders
-	GLuint quad_programID = LoadShaders( "Passthrough.vertexshader", "WobblyTexture.fragmentshader" );
+	GLuint quad_programID = LoadShaders( "Passthrough.vertexshader.glsl", "WobblyTexture.fragmentshader.glsl" );
 	GLuint texID = glGetUniformLocation(quad_programID, "renderedTexture");
 	GLuint timeID = glGetUniformLocation(quad_programID, "time");
     
@@ -315,7 +315,8 @@ int main( void )
 
 		// Use our shader
 		glUseProgram(quad_programID);
-
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, renderedTexture);
