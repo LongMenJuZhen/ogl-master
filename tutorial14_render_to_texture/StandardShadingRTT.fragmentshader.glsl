@@ -14,7 +14,32 @@ layout(location = 0) out vec4 color;
 uniform sampler2D myTextureSampler;
 uniform mat4 MV;
 uniform vec3 LightPosition_worldspace;
-
+vec3 RGB2HSV(vec3 color) {
+	vec3 hsv;
+	float min, max, delta;
+	min = min(min(color.r, color.g), color.b);
+	max = max(max(color.r, color.g), color.b);
+	hsv.z = max;
+	delta = max - min;
+	if (max != 0)
+		hsv.y = delta / max;
+	else {
+		hsv.x = 0;
+		hsv.y = 0;
+		hsv.z = 0;
+		return hsv;
+	}
+	if (color.r == max)
+		hsv.x = (color.g - color.b) / delta;
+	else if (color.g == max)
+		hsv.x = 2 + (color.b - color.r) / delta;
+	else
+		hsv.x = 4 + (color.r - color.g) / delta;
+	hsv.x *= 60;
+	if (hsv.x < 0)
+		hsv.x += 360;
+	return hsv;
+}
 void main(){
 
 	// Light emission properties
@@ -24,6 +49,7 @@ void main(){
 	
 	// Material properties
 	vec3 MaterialDiffuseColor = texture( myTextureSampler, UV ).rgb;
+	vec3 MaterialHSV = vec3(0.0,0.0,0.0);
 	vec3 MaterialAmbientColor = vec3(0.1,0.1,0.1) * MaterialDiffuseColor;
 	vec3 MaterialSpecularColor = vec3(0.3,0.3,0.3);
 
