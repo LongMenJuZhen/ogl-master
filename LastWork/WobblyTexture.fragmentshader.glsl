@@ -87,11 +87,11 @@ void main(){
 		;
 		color.g = 
 		// vec3(0,texture_value.w,0)
-		hsv2rgb (texture(renderedTexture, UV + vec2(0.1,0.0)).xyz).y
+		hsv2rgb (texture(renderedTexture, UV/* + vec2(0.1,0.0)*/).xyz).y
 		;
 		color.b = 
 		// vec3(0,texture_value.w,0)
-		hsv2rgb (texture(renderedTexture, UV - vec2(0.1,0.0)).xyz).z
+		hsv2rgb (texture(renderedTexture, UV/* - vec2(0.1,0.0)*/).xyz).z
 		;
 		color.a =1;
 	}

@@ -38,6 +38,7 @@ int main( void )
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow( 1024, 768, "写不完咧", NULL, NULL);
@@ -98,9 +99,11 @@ int main( void )
 
 	// Load the texture
 	GLuint Texture = loadDDS("uvmap.DDS");
+	GLuint DiffuseTexture = loadDDS("diffuse.DDS");
 	
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+	GLuint DiffuseTextureID  = glGetUniformLocation(programID, "DiffuseTextureSampler");
 
 	// Read our .obj file
 	std::vector<glm::vec3> vertices;
@@ -255,6 +258,10 @@ int main( void )
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
 
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, DiffuseTexture);
+		glUniform1i(DiffuseTextureID, 1);
+
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -367,8 +374,8 @@ int main( void )
 	glDeleteTextures(1, &Texture);
 
 	glDeleteFramebuffers(1, &FramebufferName);
-	// glDeleteTextures(1, &renderedTexture);
-	glDeleteRenderbuffers(1, &depthTexture);
+	glDeleteTextures(1, &renderedTexture);
+	glDeleteRenderbuffers(1, &depthrenderbuffer);
 	glDeleteBuffers(1, &quad_vertexbuffer);
 	glDeleteVertexArrays(1, &VertexArrayID);
 

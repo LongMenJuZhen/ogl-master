@@ -13,6 +13,7 @@ layout(location = 0) out vec3 color;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
+uniform sampler2D DiffuseTextureSampler;
 uniform mat4 MV;
 uniform vec3 LightPosition_worldspace;
 vec3 rgb2hsv(vec3 rgb) {
@@ -59,7 +60,7 @@ void main(){
 	float LightPower = 50.0f;
 	
 	// Material properties
-	vec3 MaterialDiffuseColor = texture( myTextureSampler, UV ).rgb;
+	vec3 MaterialDiffuseColor = texture( DiffuseTextureSampler, UV ).rgb;
 	vec3 MaterialHSV = rgb2hsv(MaterialDiffuseColor);
 	float MaterialAmbientColor = 0.1 * MaterialHSV.z;
 	float MaterialSpecularColor = 0.3;
