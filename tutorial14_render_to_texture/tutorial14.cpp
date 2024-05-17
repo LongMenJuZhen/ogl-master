@@ -77,7 +77,7 @@ int main( void )
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Enable depth test
-	// glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS); 
 
@@ -106,7 +106,7 @@ int main( void )
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
-	bool res = loadOBJ("feline.obj", vertices, uvs, normals);
+	bool res = loadOBJ("suzanne.obj", vertices, uvs, normals);
 
 	std::vector<unsigned short> indices;
 	std::vector<glm::vec3> indexed_vertices;
@@ -199,7 +199,7 @@ int main( void )
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		return false;
 
-	
+
 	// The fullscreen quad's FBO
 	static const GLfloat g_quad_vertex_buffer_data[] = { 
 		-1.0f, -1.0f, 0.0f,
@@ -373,4 +373,3 @@ int main( void )
 
 	return 0;
 }
-
