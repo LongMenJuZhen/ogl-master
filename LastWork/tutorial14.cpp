@@ -103,7 +103,7 @@ int main( void )
 	
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
-	GLuint DiffuseTextureID  = glGetUniformLocation(programID, "DiffuseTextureSampler");
+
 
 	// Read our .obj file
 	std::vector<glm::vec3> vertices;
@@ -223,6 +223,7 @@ int main( void )
 	GLuint texID = glGetUniformLocation(quad_programID, "renderedTexture");
 	GLuint depID = glGetUniformLocation(quad_programID, "depthTexture");
 	GLuint timeID = glGetUniformLocation(quad_programID, "time");
+	GLuint DiffuseTextureID  = glGetUniformLocation(quad_programID, "DiffuseTextureSampler");
     
 	
 	do{
@@ -258,9 +259,7 @@ int main( void )
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, DiffuseTexture);
-		glUniform1i(DiffuseTextureID, 1);
+
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -334,8 +333,11 @@ int main( void )
 		glUniform1i(texID, 0);
 		
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, depthTexture);
-		glUniform1i(depID,1);
+		glBindTexture(GL_TEXTURE_2D, DiffuseTexture);
+		glUniform1i(DiffuseTextureID, 1);
+		// glActiveTexture(GL_TEXTURE1);
+		// glBindTexture(GL_TEXTURE_2D, depthTexture);
+		// glUniform1i(depID,1);
 
 		glUniform1f(timeID, (float)(glfwGetTime()*10.0f) );
 

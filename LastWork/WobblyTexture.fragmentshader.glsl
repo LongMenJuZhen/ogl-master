@@ -4,7 +4,7 @@ in vec2 UV;
 
 out vec4 color;
 
-uniform  sampler2DShadow depthTexture;
+uniform  sampler2D DiffuseTextureSampler;
 uniform  sampler2D renderedTexture;
 uniform float time;
 vec3 rgb2hsv(vec3 rgb) {
@@ -87,7 +87,7 @@ void main(){
 		;
 		color.g = 
 		// vec3(0,texture_value.w,0)
-		hsv2rgb (texture(renderedTexture, UV/* + vec2(0.1,0.0)*/).xyz).y
+		hsv2rgb (texture(DiffuseTextureSampler, UV/* + vec2(0.1,0.0)*/).xyz).y
 		;
 		color.b = 
 		// vec3(0,texture_value.w,0)
