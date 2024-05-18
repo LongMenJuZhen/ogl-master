@@ -6,6 +6,7 @@ out vec4 color;
 
 uniform  sampler2D DiffuseTextureSampler;
 uniform  sampler2D renderedTexture;
+uniform sampler2D depthTexture;
 uniform float time;
 vec3 rgb2hsv(vec3 rgb) {
 	float r = rgb.r;
@@ -82,16 +83,20 @@ void main(){
 	}
 	else{
 		color.r = 
-		// vec3(0,texture_value.w,0)
-		hsv2rgb (texture_value.xyz).x
+		// 0.1
+		texture(depthTexture,gl_FragCoord.xy).z
+		// hsv2rgb (texture_value.xyz).x
 		;
 		color.g = 
 		// vec3(0,texture_value.w,0)
-		hsv2rgb (texture(DiffuseTextureSampler, UV/* + vec2(0.1,0.0)*/).xyz).y
+		// hsv2rgb (texture(DiffuseTextureSampler, UV/* + vec2(0.1,0.0)*/).xyz).y
+		0
 		;
 		color.b = 
 		// vec3(0,texture_value.w,0)
-		hsv2rgb (texture(renderedTexture, UV/* - vec2(0.1,0.0)*/).xyz).z
+		// hsv2rgb (texture(renderedTextu/re, UV/* - vec2(0.1,0.0)*/).xyz).z
+		texture(renderedTexture, UV/* - vec2(0.1,0.0)*/).w
+		// 0
 		;
 		color.a =1;
 	}

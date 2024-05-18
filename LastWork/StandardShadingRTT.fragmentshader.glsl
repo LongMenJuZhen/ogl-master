@@ -8,7 +8,7 @@ in vec3 EyeDirection_cameraspace;
 in vec3 LightDirection_cameraspace;
 
 // Ouput data
-layout(location = 0) out vec3 color;
+layout(location = 0) out vec4 color;
 
 
 // Values that stay constant for the whole mesh.
@@ -98,5 +98,6 @@ void main(){
 		// MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance)
 		;
 	color.b = 0.1+1*1*50*cosTheta / (distance*distance)+0.3*1*50*pow(cosAlpha,5) / (distance*distance);
+	color.a = 0.0;
 	// fragmentdepth=  gl_FragCoord.z;
 }
