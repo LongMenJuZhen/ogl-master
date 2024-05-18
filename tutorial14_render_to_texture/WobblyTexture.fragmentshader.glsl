@@ -52,15 +52,19 @@ float mymod(float x_or_y,float pot_size){
 	}
 }
 void main(){
-	// 
-	vec4 texture_value= texture(renderedTexture, UV/* +  0.005* vec2( sin(0.5*time+1024.0*UV.x),cos(0.5*time+768.0*UV.y))*/);
-	float pot_size = 16;
+	texture_pixel = texture( renderedTexture, UV );
+	
+	float color_intensity = (texture_pixel.x+texture_pixel.y+texture_pixel.z)/2.0;
+	
+	int pot_size = 32;
 	float dx = mymod(gl_FragCoord.x,pot_size);
 	float dy = mymod(gl_FragCoord.y,pot_size);
-	float percent=(1-texture_value.z);
-	if(dx*dx+dy*dy<pot_size*pot_size*percent*percent/4.0){
-		color.rgb = hsv2rgb(rgb2hsv(vec3(0,0,0)));
-		color.a = 1.0;
+
+	color.rgb = vec3(0.0,0.0,0.0);
+	color.a = 0.0;
+	if(dx*dx+dy*dy<pot_size*pot_size/4.0){
+		color.rgb = texture( renderedTexture, UV +  0.005* vec2( sin(0.5*time+1024.0*UV.x),cos(0.5*time+768.0*UV.y))).xyz/color_intensity*color_intensity;
+		color.a =1;
 	}
 	else{
 		color.rgb = hsv2rgb (vec3(texture_value.xyz));
