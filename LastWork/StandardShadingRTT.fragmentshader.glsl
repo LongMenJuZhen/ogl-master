@@ -98,6 +98,6 @@ void main(){
 		// MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance)
 		;
 	color.b = 0.1+1*1*50*cosTheta / (distance*distance)+0.3*1*50*pow(cosAlpha,5) / (distance*distance);
-	color.a = 0.0;
+	color.a = 1.0;
 	// fragmentdepth=  gl_FragCoord.z;
 }

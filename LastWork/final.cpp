@@ -223,11 +223,43 @@ int main( void )
 	// Create and compile our GLSL program from the shaders
 	GLuint quad_programID = LoadShaders( "Passthrough.vertexshader.glsl", "WobblyTexture.fragmentshader.glsl" );
 	GLuint texID = glGetUniformLocation(quad_programID, "renderedTexture");
+	GLuint YAtexID = glGetUniformLocation(quad_programID, "YArenderedTexture");
 	GLuint depID = glGetUniformLocation(quad_programID, "depthTexture");
 	GLuint timeID = glGetUniformLocation(quad_programID, "time");
 	GLuint DiffuseTextureID  = glGetUniformLocation(quad_programID, "DiffuseTextureSampler");
-    
-	
+    // ---------------------------------------------
+	// Render to Yet Another Texture - specific code begins here
+	// ---------------------------------------------
+	GLuint YAprogramID = LoadShaders( "onemorevertex.glsl", "onemorefrag.glsl" );
+	GLuint YAMatrixID = glGetUniformLocation(YAprogramID, "MVP");
+	GLuint YAViewMatrixID = glGetUniformLocation(YAprogramID, "V");
+	GLuint YAModelMatrixID = glGetUniformLocation(YAprogramID, "M");
+	GLuint YAvertexbuffer;
+	glGenBuffers(1, &YAvertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, YAvertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW);
+	GLuint YetAnotherFramebufferName = 0;
+	glGenFramebuffers(1, &YetAnotherFramebufferName);
+	glBindFramebuffer(GL_FRAMEBUFFER, YetAnotherFramebufferName);
+
+	GLuint YArenderedTexture;
+	glGenTextures(1, &YArenderedTexture);
+	glBindTexture(GL_TEXTURE_2D, YArenderedTexture);
+	// // Give an empty image to OpenGL ( the last "0" means "empty" )
+	glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA, windowWidth, windowHeight, 0,GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+	// Poor filtering
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, YArenderedTexture, 0);
+	GLenum YADrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+	glDrawBuffers(1, YADrawBuffers); // "1" is the size of DrawBuffers
+
+
+	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		return false;
 	do{
 		// Render to our framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
@@ -313,7 +345,32 @@ int main( void )
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
-
+		// Render to the YetAnotherFramebuffer
+		glBindFramebuffer(GL_FRAMEBUFFER, YetAnotherFramebufferName);
+		glViewport(0,0,windowWidth,windowHeight);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(YAprogramID);
+		glUniformMatrix4fv(YAMatrixID, 1, GL_FALSE, &MVP[0][0]);
+		glUniformMatrix4fv(YAModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
+		glUniformMatrix4fv(YAViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
+		
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, YAvertexbuffer);
+		glVertexAttribPointer(
+			0,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			(void*)0
+		);
+		glDrawElements(
+			GL_TRIANGLES,
+			indices.size(),
+			GL_UNSIGNED_SHORT,
+			(void*)0
+		);
+		glDisableVertexAttribArray(0);
 
 
 		// Render to the screen
@@ -341,6 +398,10 @@ int main( void )
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, depthTexture);
 		glUniform1i(depID,2);
+
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, YArenderedTexture);
+		glUniform1i(YAtexID, 3);
 
 		glUniform1f(timeID, (float)(glfwGetTime()*10.0f) );
 
