@@ -3,7 +3,7 @@
         {
             "type": "cppbuild",
             "label": "C/C++: aarch64-linux-gnu-g++ 生成活动文件",
-            "command": "/usr/bin/aarch64-linux-gnu-g++",
+            "command": "/usr/bin/g++",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
