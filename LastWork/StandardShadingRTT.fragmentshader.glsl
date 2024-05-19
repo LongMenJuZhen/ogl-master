@@ -16,6 +16,9 @@ uniform sampler2D myTextureSampler;
 uniform sampler2D DiffuseTextureSampler;
 uniform mat4 MV;
 uniform vec3 LightPosition_worldspace;
+
+uniform float AmbientStrength;
+uniform float DiffuseStrength;
 vec3 rgb2hsv(vec3 rgb) {
 	float r = rgb.r;
 	float g = rgb.g;
@@ -57,7 +60,7 @@ void main(){
 	// Light emission properties
 	// You probably want to put them as uniforms
 	vec3 LightColor = vec3(1,1,1);
-	float LightPower = 50.0f;
+	float LightPower = 256.0f;
 	
 	// Material properties
 	vec3 MaterialDiffuseColor = texture( DiffuseTextureSampler, UV ).rgb;
@@ -97,7 +100,7 @@ void main(){
 		// // Specular : reflective highlight, like a mirror
 		// MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance)
 		;
-	color.b = 0.1+1*1*50*cosTheta / (distance*distance)+0.3*1*50*pow(cosAlpha,5) / (distance*distance);
+	color.b = 0.2*AmbientStrength+DiffuseStrength*1*1*LightPower*cosTheta / (distance*distance)+0.3*1*LightPower*pow(cosAlpha,5) / (distance*distance);
 	color.a = 1.0;
 	// fragmentdepth=  gl_FragCoord.z;
 }

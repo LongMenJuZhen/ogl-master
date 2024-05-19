@@ -9,6 +9,7 @@ uniform  sampler2D renderedTexture;
 uniform sampler2D YArenderedTexture;
 uniform sampler2D depthTexture;
 uniform float time;
+
 vec3 rgb2hsv(vec3 rgb) {
 	float r = rgb.r;
 	float g = rgb.g;
@@ -74,8 +75,8 @@ void main(){
 	if(dx*dx+dy*dy<pot_size*pot_size*percent*percent/4.0){
 		color.rgb = 
 		// hsv2rgb(rgb2hsv(vec3(0,0,0)))
-		// vec3(0,0,0)
-		texture(YArenderedTexture,UV).xyz
+		vec3(0,0,0)
+		// texture(YArenderedTexture,UV).xyz
 		// vec3(texture(depthTexture,vec3(0.5,0.5,0.5)),0.5,0)
 		;
 		// if(texture_value.w<0.5){
@@ -91,7 +92,7 @@ void main(){
 		;
 		color.g = 
 		// vec3(0,texture_value.w,0)
-		hsv2rgb (texture(DiffuseTextureSampler, UV/* + vec2(0.1,0.0)*/).xyz).y
+		hsv2rgb (texture(renderedTexture, UV/* + vec2(0.1,0.0)*/).xyz).y
 		// 0
 		;
 		color.b = 

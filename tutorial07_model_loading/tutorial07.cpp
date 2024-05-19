@@ -20,6 +20,30 @@ using namespace glm;
 #include <common/controls.hpp>
 #include <common/objloader.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+GLuint myloadpng(const char *filepath){
+	int x, y, n;
+	unsigned char *data = stbi_load(filepath, &x, &y, &n, 0);
+	if(data == NULL){
+		fprintf(stderr, "Error: could not load image %s\n", filepath);
+		return 0;
+	}
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	if(n == 3){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	}else if(n == 4){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}else{
+		fprintf(stderr, "Error: unknown number of components %d\n", n);
+		return 0;
+	}
+	stbi_image_free(data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	return textureID;
+}
 int main( void )
 {
 	// Initialise GLFW
@@ -86,7 +110,7 @@ int main( void )
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 	// Load the texture
-	GLuint Texture = loadDDS("uvmap.DDS");
+	GLuint Texture = myloadpng("fll.png");
 	
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
@@ -95,7 +119,7 @@ int main( void )
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals; // Won't be used at the moment.
-	bool res = loadOBJ("/home/lmz/项目/ogl-master/资产/模型/feline.obj", vertices, uvs, normals);
+	bool res = loadOBJ("fll.obj", vertices, uvs, normals);
 
 	// Load it into a VBO
 

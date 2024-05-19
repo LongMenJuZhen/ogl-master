@@ -4,6 +4,7 @@
 void computeMatricesFromInputs();
 void computeMatricesFromInputs_fix(); //old, stupid control..
 glm::mat4 getViewMatrix();
+glm::vec3 getCameraPosition();
 glm::mat4 getProjectionMatrix();
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void fractalGetInput(GLdouble &xL, GLdouble &yD, GLdouble  &xR, GLdouble &yT, int &winW, int &winH);

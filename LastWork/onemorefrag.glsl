@@ -2,6 +2,7 @@
 
 // Interpolated values from the vertex shaders
 in vec3 Position_worldspace;
+in vec3 Position_cameraspace;
 
 // Ouput data
 layout(location = 0) out vec4 color;
@@ -9,6 +10,7 @@ layout(location = 0) out vec4 color;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 MV;
+uniform vec3 CameraPosition_worldspace;
 vec3 rgb2hsv(vec3 rgb) {
 	float r = rgb.r;
 	float g = rgb.g;
@@ -46,6 +48,6 @@ vec3 hsv2rgb(vec3 hsv) {
 	return rgb + vec3(m);
 }
 void main(){
-    color.rgb = Position_worldspace;
+    color.rgb =vec3(1,1,1) *length(CameraPosition_worldspace - Position_worldspace)/20 ;
 	color.a = 1;
 }

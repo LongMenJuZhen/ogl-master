@@ -15,9 +15,11 @@ using namespace glm;
 
 glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
-
+glm::vec3 cameraPos;										//我自己搬过来的
+glm::vec3 getCameraPosition()	{	return cameraPos;	}	//我自己加的
 glm::mat4 getViewMatrix()		{	return ViewMatrix;		}
 glm::mat4 getProjectionMatrix()	{	return ProjectionMatrix;}
+
 
 const double PI = 3.14159265358979f;
 
@@ -136,11 +138,12 @@ float verticalAngle = -PI;
 float initialFoV = 45.0f;
 
 // Initial position : on the origin
-glm::vec3 cameraPos;
+
 glm::vec3 oC = glm::vec3( 0, 0, 0 ); 
 float radius = 20;
 float phi = 0.0;
 float phiSpeed = 0.002;
+
 void computeMatricesFromInputs_fix(){
 
 	// glfwGetTime is called only once, the first time this function is called

@@ -21,8 +21,36 @@ using namespace glm;
 #include <common/objloader.hpp>
 #include <common/vboindexer.hpp>
 
-
-
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+GLuint myloadpng(const char *filepath){
+	int x, y, n;
+	unsigned char *data = stbi_load(filepath, &x, &y, &n, 0);
+	if(data == NULL){
+		fprintf(stderr, "Error: could not load image %s\n", filepath);
+		return 0;
+	}
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	if(n == 3){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	}else if(n == 4){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}else{
+		fprintf(stderr, "Error: unknown number of components %d\n", n);
+		return 0;
+	}
+	stbi_image_free(data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	return textureID;
+}
+float parameter1 = 0.0f;
+char *parameter1_name = "parameter1";
+float parameter2 = 0.0f;
+char *parameter2_name = "parameter2";
+float parameter3 = 0.0f;
+char *parameter3_name = "parameter3";
 int main( void )
 {
 	// Initialise GLFW
@@ -98,18 +126,22 @@ int main( void )
 	GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
 
 	// Load the texture
-	GLuint Texture = loadDDS("uvmap.DDS");
+	GLuint Texture = myloadpng("fll.png");
 	GLuint DiffuseTexture = loadDDS("diffuse.DDS");
 	
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+
+	GLuint ASID = glGetUniformLocation(programID, "AmbientStrength");
+	GLuint DSID = glGetUniformLocation(programID, "DiffuseStrength");
+	
 
 
 	// Read our .obj file
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
-	bool res = loadOBJ("suzanne.obj", vertices, uvs, normals);
+	bool res = loadOBJ("../资产/模型/fll.obj", vertices, uvs, normals);
 
 	std::vector<unsigned short> indices;
 	std::vector<glm::vec3> indexed_vertices;
@@ -234,6 +266,7 @@ int main( void )
 	GLuint YAMatrixID = glGetUniformLocation(YAprogramID, "MVP");
 	GLuint YAViewMatrixID = glGetUniformLocation(YAprogramID, "V");
 	GLuint YAModelMatrixID = glGetUniformLocation(YAprogramID, "M");
+	GLuint CameraID = glGetUniformLocation(YAprogramID, "CameraPosition_worldspace");
 	GLuint YAvertexbuffer;
 	glGenBuffers(1, &YAvertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, YAvertexbuffer);
@@ -261,6 +294,25 @@ int main( void )
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		return false;
 	do{
+		// 调参仙人
+		if(glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS){
+			parameter1 += 0.01f;
+		}
+		if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){
+			parameter1 -= 0.01f;
+		}
+		if(glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS){
+			parameter2 += 0.01f;
+		}
+		if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
+			parameter2 -= 0.01f;
+		}
+		if(glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS){
+			parameter3 += 0.01f;
+		}
+		if(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS){
+			parameter3 -= 0.01f;
+		}
 		// Render to our framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0,0,windowWidth,windowHeight); // Render on the whole framebuffer, complete from the lower left corner to the upper right
@@ -277,6 +329,7 @@ int main( void )
 		glm::mat4 ViewMatrix = getViewMatrix();
 		glm::mat4 ModelMatrix = glm::mat4(1.0);
 		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		glm::vec3 cameraPosition = getCameraPosition();
 
 		// Send our transformation to the currently bound shader, 
 		// in the "MVP" uniform
@@ -284,7 +337,7 @@ int main( void )
 		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
 		glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
 
-		glm::vec3 lightPos = glm::vec3(4,4,4);
+		glm::vec3 lightPos = glm::vec3(16,16,16);
 		glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
 		// Bind our texture in Texture Unit 0
@@ -292,6 +345,9 @@ int main( void )
 		glBindTexture(GL_TEXTURE_2D, Texture);
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
+
+		glUniform1f(ASID, parameter1);
+		glUniform1f(DSID, parameter2);
 
 
 
@@ -353,6 +409,7 @@ int main( void )
 		glUniformMatrix4fv(YAMatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniformMatrix4fv(YAModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
 		glUniformMatrix4fv(YAViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
+		glUniform3f(CameraID, cameraPosition.x, cameraPosition.y, cameraPosition.z);
 		
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, YAvertexbuffer);
@@ -430,7 +487,8 @@ int main( void )
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 		   glfwWindowShouldClose(window) == 0 );
-
+	printf("parameter1 = %f\n", parameter1);
+	printf("parameter2 = %f\n", parameter2);
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteBuffers(1, &uvbuffer);
