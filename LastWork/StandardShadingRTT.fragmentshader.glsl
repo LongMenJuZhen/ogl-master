@@ -13,12 +13,14 @@ layout(location = 0) out vec4 color;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
-uniform sampler2D DiffuseTextureSampler;
+uniform sampler2D RampTextureSampler;
 uniform mat4 MV;
 uniform vec3 LightPosition_worldspace;
 
 uniform float AmbientStrength;
 uniform float DiffuseStrength;
+uniform float SpecularStrength;
+uniform float ChromaticAberrationStrength;
 vec3 rgb2hsv(vec3 rgb) {
 	float r = rgb.r;
 	float g = rgb.g;
@@ -55,6 +57,43 @@ vec3 hsv2rgb(vec3 hsv) {
 	else rgb = vec3(c, 0, x);
 	return rgb + vec3(m);
 }
+// 哈希函数，用于生成伪随机梯度向量
+float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+// 线性插值
+float lerp(float a, float b, float t) {
+    return a + t * (b - a);
+}
+
+// 平滑插值函数
+float smoothstep(float edge0, float edge1, float x) {
+    float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
+}
+
+// 2D柏林噪声函数
+float perlinNoise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    
+    // 平滑插值
+    f = f * f * (3.0 - 2.0 * f);
+    
+    // 为格点分配伪随机值
+    float a = hash(i);
+    float b = hash(i + vec2(1.0, 0.0));
+    float c = hash(i + vec2(0.0, 1.0));
+    float d = hash(i + vec2(1.0, 1.0));
+    
+    // 插值
+    float mixAB = lerp(a, b, f.x);
+    float mixCD = lerp(c, d, f.x);
+    float mixFinal = lerp(mixAB, mixCD, f.y);
+    
+    return mixFinal;
+}
 void main(){
 
 	// Light emission properties
@@ -63,13 +102,14 @@ void main(){
 	float LightPower = 256.0f;
 	
 	// Material properties
-	vec3 MaterialDiffuseColor = texture( DiffuseTextureSampler, UV ).rgb;
-	vec3 MaterialHSV = rgb2hsv(MaterialDiffuseColor);
+	vec3 MaterialColor = texture( myTextureSampler, UV ).rgb;
+	vec3 MaterialHSV = rgb2hsv(MaterialColor);
+	
 	float MaterialAmbientColor = 0.1 * MaterialHSV.z;
 	float MaterialSpecularColor = 0.3;
-
+	float MaterialDiffuseColor = 0.6;
 	// Distance to the light
-	float distance = length( LightPosition_worldspace - Position_worldspace );
+	float distance = length( LightPosition_worldspace - Position_worldspace);
 
 	// Normal of the computed fragment, in camera space
 	vec3 n = normalize( Normal_cameraspace );
@@ -100,7 +140,13 @@ void main(){
 		// // Specular : reflective highlight, like a mirror
 		// MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance)
 		;
-	color.b = 0.2*AmbientStrength+DiffuseStrength*1*1*LightPower*cosTheta / (distance*distance)+0.3*1*LightPower*pow(cosAlpha,5) / (distance*distance);
+	MaterialDiffuseColor = MaterialDiffuseColor  * LightPower * cosTheta / (distance*distance);
+	MaterialSpecularColor = MaterialSpecularColor * LightPower * pow(cosAlpha,5) / (distance*distance);
+	float AmbientSample = rgb2hsv(texture( RampTextureSampler, vec2(MaterialAmbientColor, 0.875)).rgb).z;
+	float DiffuseSample = rgb2hsv(texture( RampTextureSampler, vec2(MaterialDiffuseColor, 0.625)).rgb).z;
+	float SpecularSample = rgb2hsv(texture( RampTextureSampler, vec2(MaterialSpecularColor, 0.375)).rgb).z;
+
+	color.b = MaterialAmbientColor*AmbientStrength+DiffuseStrength*1*1*LightPower*cosTheta / (distance*distance)+SpecularStrength*0.3*1*LightPower*pow(cosAlpha,5) / (distance*distance);
 	color.a = 1.0;
 	// fragmentdepth=  gl_FragCoord.z;
 }

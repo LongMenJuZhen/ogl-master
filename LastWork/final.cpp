@@ -45,12 +45,22 @@ GLuint myloadpng(const char *filepath){
 	glGenerateMipmap(GL_TEXTURE_2D);
 	return textureID;
 }
-float parameter1 = 0.0f;
+float parameter1 = 7.180069;
 char *parameter1_name = "parameter1";
-float parameter2 = 0.0f;
+float parameter2 = 0.060000;
 char *parameter2_name = "parameter2";
-float parameter3 = 0.0f;
+float parameter3 = 0.589999;
 char *parameter3_name = "parameter3";
+float parameter4 = 0.000000;
+char *parameter4_name = "parameter4";
+float parameter5 = 0.000000;
+char *parameter5_name = "parameter5";
+float parameter6 = 0.000000;
+char *parameter6_name = "parameter6";
+float parameter7 = 0.000000;
+char *parameter7_name = "parameter7";
+float parameter8 = 0.000000;
+char *parameter8_name = "parameter8";
 int main( void )
 {
 	// Initialise GLFW
@@ -127,13 +137,16 @@ int main( void )
 
 	// Load the texture
 	GLuint Texture = myloadpng("fll.png");
+	GLuint RampTexture = myloadpng("ramptex.png");
 	GLuint DiffuseTexture = loadDDS("diffuse.DDS");
 	
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+	GLuint RampTextureID = glGetUniformLocation(programID, "RampTextureSampler");
 
 	GLuint ASID = glGetUniformLocation(programID, "AmbientStrength");
 	GLuint DSID = glGetUniformLocation(programID, "DiffuseStrength");
+	GLuint SSID = glGetUniformLocation(programID, "SpecularStrength");
 	
 
 
@@ -313,6 +326,9 @@ int main( void )
 		if(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS){
 			parameter3 -= 0.01f;
 		}
+		if(glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS){
+			parameter4 += 0.1f;
+		}
 		// Render to our framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0,0,windowWidth,windowHeight); // Render on the whole framebuffer, complete from the lower left corner to the upper right
@@ -346,8 +362,15 @@ int main( void )
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
 
+		// Bind our ramp texture in Texture Unit 1
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, RampTexture);
+		glUniform1i(RampTextureID, 1);
+
+
 		glUniform1f(ASID, parameter1);
 		glUniform1f(DSID, parameter2);
+		glUniform1f(SSID, parameter3);
 
 
 
@@ -489,6 +512,7 @@ int main( void )
 		   glfwWindowShouldClose(window) == 0 );
 	printf("parameter1 = %f\n", parameter1);
 	printf("parameter2 = %f\n", parameter2);
+	printf("parameter3 = %f\n", parameter3);
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteBuffers(1, &uvbuffer);
