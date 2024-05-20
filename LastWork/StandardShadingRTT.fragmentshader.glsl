@@ -131,8 +131,9 @@ void main(){
 	//  - Looking into the reflection -> 1
 	//  - Looking elsewhere -> < 1
 	float cosAlpha = clamp( dot( E,R ), 0,1 );
+	float cosEdge = clamp( dot( E,n ), 0,1 );
 	
-	color.rg =MaterialHSV.xy
+	color.r =MaterialHSV.x;//+ChromaticAberrationStrength*perlinNoise(Position_worldspace.xy*8);
 		// // Ambient : simulates indirect lighting
 		// MaterialAmbientColor +
 		// // Diffuse : "color" of the object
@@ -140,13 +141,21 @@ void main(){
 		// // Specular : reflective highlight, like a mirror
 		// MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance)
 		;
+	color.g = MaterialHSV.y+ChromaticAberrationStrength*perlinNoise(Position_worldspace.xy*6);
 	MaterialDiffuseColor = MaterialDiffuseColor  * LightPower * cosTheta / (distance*distance);
 	MaterialSpecularColor = MaterialSpecularColor * LightPower * pow(cosAlpha,5) / (distance*distance);
 	float AmbientSample = rgb2hsv(texture( RampTextureSampler, vec2(MaterialAmbientColor, 0.875)).rgb).z;
 	float DiffuseSample = rgb2hsv(texture( RampTextureSampler, vec2(MaterialDiffuseColor, 0.625)).rgb).z;
 	float SpecularSample = rgb2hsv(texture( RampTextureSampler, vec2(MaterialSpecularColor, 0.375)).rgb).z;
 
-	color.b = MaterialAmbientColor*AmbientStrength+DiffuseStrength*1*1*LightPower*cosTheta / (distance*distance)+SpecularStrength*0.3*1*LightPower*pow(cosAlpha,5) / (distance*distance);
-	color.a = 1.0;
+	color.b = 
+	// cosEdge;
+	MaterialAmbientColor*AmbientStrength+
+	floor(DiffuseStrength*1*1*LightPower*cosTheta / (distance*distance)*5)/5+
+	SpecularStrength*0.3*1*LightPower*pow(cosAlpha,5) / (distance*distance);
+	if (cosEdge<0.1){
+		color.b = 0;
+	}
+	color.a = 1.0f;
 	// fragmentdepth=  gl_FragCoord.z;
 }

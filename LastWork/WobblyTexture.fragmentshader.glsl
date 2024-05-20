@@ -68,16 +68,17 @@ void main(){
 	vec4 texture_value= texture(renderedTexture, UV/* +  0.005* vec2( sin(0.5*time+1024.0*UV.x),cos(0.5*time+768.0*UV.y))*/);
 	float d_light = lightGradient();
 	// texture_value.x = texture_value.x*(1-d_light)+d_light*0.8333;
-	float pot_size = 16;
+	float pot_size = 8;
 	float dx = mymod(gl_FragCoord.x,pot_size);
 	float dy = mymod(gl_FragCoord.y,pot_size);
 	float percent=(1-texture_value.z);
-	if(dx*dx+dy*dy<pot_size*pot_size*percent*percent/4.0){
+	if(dx*dx+dy*dy<pot_size*pot_size*percent*percent&&percent>0.4){
 		color.rgb = 
 		// hsv2rgb(rgb2hsv(vec3(0,0,0)))
-		vec3(0,0,0)
+		// vec3(0,0,0)
 		// texture(YArenderedTexture,UV).xyz
 		// vec3(texture(depthTexture,vec3(0.5,0.5,0.5)),0.5,0)
+		hsv2rgb(texture(renderedTexture, UV).xyz-vec3(0,0,0.2)).xyz
 		;
 		// if(texture_value.w<0.5){
 		// 	color.rgb = 

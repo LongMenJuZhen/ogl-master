@@ -47,11 +47,11 @@ GLuint myloadpng(const char *filepath){
 }
 float parameter1 = 7.180069;
 char *parameter1_name = "parameter1";
-float parameter2 = 0.060000;
+float parameter2 = 0.740000;
 char *parameter2_name = "parameter2";
-float parameter3 = 0.589999;
+float parameter3 = 0.529999;
 char *parameter3_name = "parameter3";
-float parameter4 = 0.000000;
+float parameter4 = 0.070000;
 char *parameter4_name = "parameter4";
 float parameter5 = 0.000000;
 char *parameter5_name = "parameter5";
@@ -113,7 +113,7 @@ int main( void )
     glfwSetCursorPos(window, 1024/2, 768/2);
 
 	// Dark  background
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -147,6 +147,7 @@ int main( void )
 	GLuint ASID = glGetUniformLocation(programID, "AmbientStrength");
 	GLuint DSID = glGetUniformLocation(programID, "DiffuseStrength");
 	GLuint SSID = glGetUniformLocation(programID, "SpecularStrength");
+	GLuint CAID = glGetUniformLocation(programID, "ChromaticAberrationStrength");
 	
 
 
@@ -327,7 +328,10 @@ int main( void )
 			parameter3 -= 0.01f;
 		}
 		if(glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS){
-			parameter4 += 0.1f;
+			parameter4 += 0.01f;
+		}
+		if(glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS){
+			parameter4 -= 0.01f;
 		}
 		// Render to our framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
@@ -371,6 +375,7 @@ int main( void )
 		glUniform1f(ASID, parameter1);
 		glUniform1f(DSID, parameter2);
 		glUniform1f(SSID, parameter3);
+		glUniform1f(CAID, parameter4);
 
 
 
@@ -513,6 +518,7 @@ int main( void )
 	printf("parameter1 = %f\n", parameter1);
 	printf("parameter2 = %f\n", parameter2);
 	printf("parameter3 = %f\n", parameter3);
+	printf("parameter4 = %f\n", parameter4);
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteBuffers(1, &uvbuffer);
