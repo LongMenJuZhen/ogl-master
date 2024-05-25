@@ -141,7 +141,7 @@ void main(){
 		// // Specular : reflective highlight, like a mirror
 		// MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance)
 		;
-	color.g = MaterialHSV.y+ChromaticAberrationStrength*perlinNoise(Position_worldspace.xy*6);
+	color.g = MaterialHSV.y/* +ChromaticAberrationStrength*perlinNoise(Position_worldspace.xy*6) */;
 	MaterialDiffuseColor = MaterialDiffuseColor  * LightPower * cosTheta / (distance*distance);
 	MaterialSpecularColor = MaterialSpecularColor * LightPower * pow(cosAlpha,5) / (distance*distance);
 	float AmbientSample = rgb2hsv(texture( RampTextureSampler, vec2(MaterialAmbientColor, 0.875)).rgb).z;
